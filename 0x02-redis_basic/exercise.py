@@ -1,5 +1,8 @@
-ing the Redis NoSQL data storage.
+#!/usr/bin/env python3
+'''        
+A module for using the Redis NoSQL data storage.
 '''
+
 from functools import wraps
 from typing import Any, Callable, Union
 import redis
@@ -10,13 +13,14 @@ def count_calls(method: Callable) -> Callable:
     '''Tracks the number of calls made to a method in a Cache class.
     '''
     @wraps(method)
-    def wrapper(self, *args, **kwds) -> Any:
+    def wrapper(self, *args, **kwargs) -> Any:
         '''returns the given method after incrementing its call counter.
         '''
-        # print('Calling decorated function')
+
         if isinstance(self._redis, redis.Redis):
             self._redis.incr(method.__qualname__)
-        return method(self, *args, **kwds)
+        return method(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -66,17 +70,18 @@ def replay(fn: Callable) -> None:
 class Cache:
     '''Represents an object for storing data in a Redis data storage.
     '''
+
     def __init__(self) -> None:
         self._redis = redis.Redis()
         self._redis.flushdb(True)
 
     @call_history
     @count_calls
-    def store(self, data: Union[str, bytes, int, float]) -> str:
-        '''Stores a value in a Redis data storage and returns the key.'''
+    def store(self, data:  Union[str, bytes, int, float]) -> str:
+        '''Stores a value in a Redis data storage and returns the key.
+        '''
         data_key = str(uuid.uuid4())
         self._redis.set(data_key, data)
-        # print(data_key)
         return data_key
 
     def get(
@@ -97,4 +102,4 @@ class Cache:
     def get_int(self, key: str) -> int:
         '''Retrieves an integer value from a Redis data storage.
         '''
-        return self.get(key, lambda x: int(x))
+        return self.get(key, lambda x: int(x))eturn self.get(key, lambda x: int(x))
